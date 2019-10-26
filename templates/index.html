@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+
+
+  <!-- CSS -->
+  {% block css %}
+  <link rel="stylesheet" href="{{ get_url(path="pure/base.css") | safe }}">
+  <link rel="stylesheet" href="{{ get_url(path="pure/pure.css") | safe }}">
+  {% endblock css %}
+
+  {% if config.generate_rss %}
+     <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ get_url(path="rss.xml", trailing_slash=false) }}">
+   {% endif %}
+
+   {% block extra_head %}
+   {% endblock extra_head %}
+</head>
+<body>
+  <h1><a href="/">Stefan Müller - Hard- und Software Entwicklung</a>
+
+    <div class="menu">
+     {% block before_menu %}
+     {% endblock before_menu %}
+     <nav role="navigation">
+         <ul>
+         {% block menu %}
+           {% set index = get_section(path="_index.md") %}
+           {% for s in index.subsections %}
+               {% set subsection = get_section(path=s) %}
+               <li {% if current_path == subsection.path %}class="active"{% endif %}>
+                   <a href="{{ subsection.permalink }}">
+                     {{ subsection.title }}
+                   </a>
+                   {% if subsection.pages %}
+                   <ul>
+                   {% for page in subsection.pages %}
+                     <li {% if current_path == page.path %}class="active"{% endif %}>
+                       <a href="{{ page.permalink }}">
+                         {{ page.title }}
+                       </a>
+                     </li>
+                   {% endfor %}
+                   </ul>
+                   {% endif %}
+               </li>
+           {% endfor %}
+         {% endblock menu %}
+         </ul>
+     </nav>
+     {% block after_menu %}
+     {% endblock after_menu %}
+   </div>
+
+  <div class="content container">
+    {% block content %}
+      {% for page in section.pages | reverse %}
+        <div class="post">
+          <h1 class="post-title">
+            <a href="{{ page.permalink }}">
+              {{ page.title }}
+            </a>
+          </h1>
+          <p class="post-date">{{ page.date | date(format="%Y-%m-%d") }}</p>
+        </div>
+      {% endfor %}
+    {% endblock content %}
+  </div>
+</body>
+</html>
